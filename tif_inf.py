@@ -9,6 +9,15 @@ from sklearn.preprocessing import PolynomialFeatures
 # flaot32
 # 0~ 78.0
 
+def rotation(img,angle,center=None):
+    (h,w) = img.shape[:2]
+
+    if center is None:
+        center = (w/2, h/2)
+    R = cv2.getRotationMatrix2D(center, angle=angle, scale=1.0)
+    img = cv2.warpAffine(img, R, (w, h))
+
+    return img
 """
 get every point(x,y) in tiff
 return x axis and y axis
@@ -21,6 +30,18 @@ def tif_to_point(img_path):
     print(img.shape)
     plt.imshow(img)
     plt.show()
+
+    ##############
+    while True:
+        rot = input("Whether to ratate, if yes, type degree(Ex:45), else type n: ")
+        if rot!= 'n':
+            img = rotation(img, float(rot), center=None)
+            plt.imshow(img)
+            plt.show()
+        else:
+            break
+    ##############
+
     x_axis = []
     y_axis = []
     for x in range(img.shape[0]):
@@ -73,28 +94,49 @@ def simple_regression(x,y,img):
    input2=end point
 4. auto calculate total length
 """
+
+def chooselinear(x,y):
+    colors = ['green', 'purple', 'gold', 'blue', 'black']
+    plt.scatter(x,y,s=1, c='red')
+    s_x = []
+    for count,degree in enumerate([1,2,3,4,5]):
+        s_x.append(list(x))
+        s_x = np.array([token for st in s_x for token in s_x])
+        Degree = degree*3
+        model = np.poly1d(np.polyfit(x,y,Degree))
+        s_x.sort()
+        s_x = s_x.reshape(-1,1)
+        plt.plot(s_x, model(s_x), color=colors[count],label='degree %d' %Degree, linewidth=2)
+        s_x = []
+    plt.xlim(0,img.shape[1])
+    plt.ylim(img.shape[0],0)
+    plt.legend(loc=2)
+    plt.show()
+
+    choose_deg = int(input('Type degree more suitable: '))
+    return choose_deg
+
+
 def nonlinear(x,y):
-    # model = make_pipeline(PolynomialFeatures(23),linear_model.LinearRegression())
-    # model.fit(x,y) # not use so far
     x= x.flatten()
     y= y.flatten()
     # model = linear_model.LogisticRegression()
     # model = make_pipeline(PolynomialFeatures(5), linear_model.LinearRegression())
     # model.fit(x,y)
+    # x = x.flatten()
 
     dic_x = list(x.flatten())
     dic_y = list(y.flatten())
     dic = dict(zip(dic_x,dic_y))
 
-    model = np.poly1d(np.polyfit(x,y,10))
-    plt.scatter(x,y,s=1, color='black')
-    # x = x.flatten()
-    #################
+    choose_deg = chooselinear(x,y)
+    model = np.poly1d(np.polyfit(x,y,choose_deg))
+    plt.scatter(x, y, s=1, color='black')
     # temporal use
     x.sort()
     x = x.reshape(-1,1)
-    print(x)
-    #################
+    # print(x)
+
     plt.xlim(0,img.shape[1])
     plt.ylim(img.shape[0],0)
     plt.plot(x, model(x), color='blue', linewidth=1)
@@ -107,9 +149,9 @@ def nonlinear(x,y):
     x0 = float(x0)
     x1 = float(x1)
 
-    each_width = (x1 - x0)/500
+    each_width = (x1 - x0)/1000
     d = 0
-    for i in range(500):
+    for i in range(1000):
         p0 = model(x0 + i*each_width)
         p1 = model(x0 + (i+1)*each_width)
         d += (((x0 + (i+1)*each_width) - (x0 + i*each_width))**2 + (p1-p0)**2)**0.5
@@ -118,6 +160,6 @@ def nonlinear(x,y):
     return d
 
 if __name__=='__main__':
-    x,y,img = tif_to_point(img_path="test1.tiff")
+    x,y,img = tif_to_point(img_path="test.tiff")
     x,y = simple_regression(x,y,img)
     nonlinear(x,y)
