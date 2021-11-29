@@ -1,4 +1,5 @@
 import cv2
+import math
 import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.pipeline import make_pipeline
@@ -16,6 +17,19 @@ def rotation(img,angle,center=None):
         center = (w/2, h/2)
     R = cv2.getRotationMatrix2D(center, angle=angle, scale=1.0)
     img = cv2.warpAffine(img, R, (w, h))
+
+    return img
+
+
+def rotate_img(img):
+    (h, w) = img.shape  # 讀取圖片大小
+    center = (w // 2, h // 2)  # 找到圖片中心
+
+    # 第一個參數旋轉中心，第二個參數旋轉角度(-順時針/+逆時針)，第三個參數縮放比例
+    M = cv2.getRotationMatrix2D(center, 90, 1.0)
+
+    # 第三個參數變化後的圖片大小
+    img = cv2.warpAffine(img, M, (w, h))
 
     return img
 """
@@ -159,7 +173,55 @@ def nonlinear(x,y):
     print("Total length between start point and end point is: ",d," (pixel)")
     return d
 
+def width(wimg_path):
+    img = cv2.imread(wimg_path, 2)
+    if len(img) < len(img[0]):
+        img = np.transpose(img,(1,0))
+        print(img.shape)
+    img = cv2.GaussianBlur(img, (1, 7), 2)
+    img = (((img - img.min())/img.max())*255.0)
+    _, img = cv2.threshold(img, 1, 255, 0)
+    # plt.imshow(img)
+    # plt.show()
+    length = math.ceil(len(img)/20)-2
+
+    space = []
+    qq = []
+    distance = []
+    for i in range(length):
+
+        for j in range(20):
+            for k in range(len(img[0])):
+                if img[i*20 +j][k]!=0.0:
+                    space.append([i*20+j,k])
+
+        for l in range(len(space)):
+            if space[l][0]< i*20+2:
+                qq.append(space[l][1])
+        # # print(i)
+        # if len(space)>=20:
+        #     for l in range(len(space)):
+        #         qq.append(space[l][1])
+        qq.sort()
+        d=math.ceil(len(qq)/100)-1
+        D=math.ceil(len(qq)/100*95)-1
+        dist = qq[D]-qq[d]
+        distance.append([i*20+1,dist,qq[d],qq[D]])
+        qq = []
+
+        space=[]
+    # print("distance: ",distance)
+    img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
+    for i in range(len(distance)):
+        cv2.line(img, (distance[i][2], distance[i][0]), (distance[i][3], distance[i][0]), (255,0,255), 1)
+    # plt.imshow(img)
+    # plt.show()
+    cv2.imshow('My Image', img)
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 if __name__=='__main__':
-    x,y,img = tif_to_point(img_path="test.tiff")
-    x,y = simple_regression(x,y,img)
-    nonlinear(x,y)
+    # x,y,img = tif_to_point(img_path="test.tiff")
+    # x,y = simple_regression(x,y,img)
+    # nonlinear(x,y)
+    width(wimg_path="testqq3.tiff")
