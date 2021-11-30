@@ -217,16 +217,20 @@ def width(wimg_path):
         qq2 = []
 
         space=[]
-    print("distance: ",distance)
+    # print("distance: ",distance)
     img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
     for i in range(len(distance)):
         cv2.line(img, (distance[i][2], distance[i][0]), (distance[i][3], distance[i][0]), (255,0,255), 1)
+    new_distance = []
+    for x in range(len(distance)):
+        new_distance.append((distance[x][0], distance[x][1]))
+    print("(pixel location, distance)",new_distance)
     # plt.imshow(img)
     # plt.show()
-    cv2.imshow('My Image', img)
-
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # cv2.imshow('My Image', img)
+    #
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 if __name__=='__main__':
     # x,y,img = tif_to_point(img_path="test.tiff")
     # x,y = simple_regression(x,y,img)
