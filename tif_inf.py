@@ -178,7 +178,7 @@ def width(wimg_path):
     if len(img) < len(img[0]):
         img = np.transpose(img,(1,0))
         print(img.shape)
-    img = cv2.GaussianBlur(img, (1, 13), 2)
+    img = cv2.GaussianBlur(img, (1, 17), 7)
     img = (((img - img.min())/img.max())*255.0)
     _, img = cv2.threshold(img, 1, 255, 0)
     # plt.imshow(img)
@@ -206,33 +206,36 @@ def width(wimg_path):
         qq.sort()
         d=math.ceil(len(qq)/100)-1
         D=math.ceil(len(qq)/100*95)-1
-        dist = qq[D]-qq[d]
-        qq2.sort()
-        d2=math.ceil(len(qq2)/100)-1
-        D2=math.ceil(len(qq2)/100*95)-1
-        dist2 = qq2[D2]-qq2[d2]
-        Dist = (dist+dist2)/2
-        distance.append([i*20+2,Dist,math.ceil((qq[d]+qq2[d2])/2),math.ceil((qq[D]+qq2[D2])/2)])
-        qq = []
-        qq2 = []
 
-        space=[]
+        qq2.sort()
+        d2 = math.ceil(len(qq2) / 100) - 1
+        D2 = math.ceil(len(qq2) / 100 * 95) - 1
+
+        if d!=-1 and d2!=-1:
+            dist = qq[D]-qq[d]
+            dist2 = qq2[D2]-qq2[d2]
+            Dist = (dist+dist2)/2
+            distance.append([i*20+2,Dist,math.ceil((qq[d]+qq2[d2])/2),math.ceil((qq[D]+qq2[D2])/2)])
+            qq = []
+            qq2 = []
+
+            space=[]
     # print("distance: ",distance)
     img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
     for i in range(len(distance)):
-        cv2.line(img, (distance[i][2], distance[i][0]), (distance[i][3], distance[i][0]), (255,0,255), 1)
+        cv2.line(img, (distance[i][2], distance[i][0]), (distance[i][3], distance[i][0]), (255,0,255), 3)
     new_distance = []
     for x in range(len(distance)):
         new_distance.append((distance[x][0], distance[x][1]))
     print("(pixel location, distance)",new_distance)
     # plt.imshow(img)
     # plt.show()
-    # cv2.imshow('My Image', img)
-    #
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    cv2.imshow('My Image', img)
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 if __name__=='__main__':
     # x,y,img = tif_to_point(img_path="test.tiff")
     # x,y = simple_regression(x,y,img)
     # nonlinear(x,y)
-    width(wimg_path="testqq3.tiff")
+    width(wimg_path="testqq.tiff")
