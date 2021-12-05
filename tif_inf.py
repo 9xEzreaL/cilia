@@ -177,7 +177,7 @@ def width(wimg_path):
     img = cv2.imread(wimg_path, 2)
     if len(img) < len(img[0]):
         img = np.transpose(img,(1,0))
-        print(img.shape)
+    print(img.shape)
     img = cv2.GaussianBlur(img, (1, 17), 7)
     img = (((img - img.min())/img.max())*255.0)
     _, img = cv2.threshold(img, 1, 255, 0)
@@ -188,6 +188,10 @@ def width(wimg_path):
     space = []
     qq = []
     qq2 = []
+    qq3 = []
+    qq4 = []
+    qq5 = []
+    qq6 = []
     distance = []
     for i in range(length):
 
@@ -200,9 +204,20 @@ def width(wimg_path):
             if space[l][0]< i*20+2:
                 qq.append(space[l][1])
 
-            if space[l][0]> i*20+2 and space[l][0]< i*20+4:
+            if space[l][0]>= i*20+2 and space[l][0]< i*20+4:
                 qq2.append(space[l][1])
 
+            if space[l][0]>= i*20+8 and space[l][0]< i*20+10:
+                qq3.append(space[l][1])
+
+            if space[l][0]> i*20+10 and space[l][0]< i*20+12:
+                qq4.append(space[l][1])
+
+            if space[l][0] >= i * 20 + 16 and space[l][0] < i * 20 + 18:
+                qq5.append(space[l][1])
+
+            if space[l][0] > i * 20 + 18 and space[l][0] < i * 20 + 20:
+                qq6.append(space[l][1])
         qq.sort()
         d=math.ceil(len(qq)/100)-1
         D=math.ceil(len(qq)/100*95)-1
@@ -211,29 +226,56 @@ def width(wimg_path):
         d2 = math.ceil(len(qq2) / 100) - 1
         D2 = math.ceil(len(qq2) / 100 * 95) - 1
 
-        if d!=-1 and d2!=-1:
+        qq3.sort()
+        d3 = math.ceil(len(qq3) / 100) - 1
+        D3 = math.ceil(len(qq3) / 100 * 95) - 1
+
+        qq4.sort()
+        d4 = math.ceil(len(qq4) / 100) - 1
+        D4 = math.ceil(len(qq4) / 100 * 95) - 1
+
+        qq5.sort()
+        d5 = math.ceil(len(qq5) / 100) - 1
+        D5 = math.ceil(len(qq5) / 100 * 95) - 1
+
+        qq6.sort()
+        d6 = math.ceil(len(qq6) / 100) - 1
+        D6 = math.ceil(len(qq6) / 100 * 95) - 1
+        if d!=-1 and d2!=-1 and d3!=-1 and d4!=-1 and d5!=-1 and d6!=-1:
             dist = qq[D]-qq[d]
             dist2 = qq2[D2]-qq2[d2]
+            dist3 = qq3[D3]-qq3[d3]
+            dist4 = qq4[D4]-qq4[d4]
+            dist5 = qq5[D5]-qq5[d5]
+            dist6 = qq6[D6]-qq6[d6]
             Dist = (dist+dist2)/2
+            Dist2 = (dist3+dist4)/2
+            Dist3 = (dist5+dist6)/2
             distance.append([i*20+2,Dist,math.ceil((qq[d]+qq2[d2])/2),math.ceil((qq[D]+qq2[D2])/2)])
+            distance.append([i*20+10,Dist2,math.ceil((qq3[d3]+qq4[d4])/2),math.ceil((qq3[D3]+qq4[D4])/2)])
+            distance.append([i*20+18, Dist3, math.ceil((qq5[d5] + qq6[d6]) / 2), math.ceil((qq5[D5] + qq6[D6]) / 2)])
             qq = []
             qq2 = []
-
+            qq3 = []
+            qq4 = []
+            qq5 = []
+            qq6 = []
             space=[]
-    # print("distance: ",distance)
+
+
+    new_distance = []
     img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
     for i in range(len(distance)):
+
         cv2.line(img, (distance[i][2], distance[i][0]), (distance[i][3], distance[i][0]), (255,0,255), 3)
-    new_distance = []
-    for x in range(len(distance)):
-        new_distance.append((distance[x][0], distance[x][1]))
+        new_distance.append((distance[i][0], distance[i][1]))
     print("(pixel location, distance)",new_distance)
     # plt.imshow(img)
     # plt.show()
-    cv2.imshow('My Image', img)
-
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # cv2.imshow('My Image', img)
+    #
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
 if __name__=='__main__':
     # x,y,img = tif_to_point(img_path="test.tiff")
     # x,y = simple_regression(x,y,img)
