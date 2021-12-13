@@ -175,8 +175,14 @@ def nonlinear(x,y):
 
 def width(wimg_path):
     img = cv2.imread(wimg_path, 2)
+    money = cv2.imread('money.png').astype('float32')
+
     if len(img) < len(img[0]):
         img = np.transpose(img,(1,0))
+    money = cv2.resize(money, (img.shape[1],img.shape[1]))
+    h = img.shape[0]-money.shape[0]
+    w = 0
+    money = cv2.copyMakeBorder(money, 0, h, 0, w, cv2.BORDER_CONSTANT, value=0)
     print(img.shape)
     img = cv2.GaussianBlur(img, (1, 17), 7)
     img = (((img - img.min())/img.max())*255.0)
@@ -192,6 +198,10 @@ def width(wimg_path):
     qq4 = []
     qq5 = []
     qq6 = []
+    qq7 = []
+    qq8 = []
+    qq9 = []
+    qq10 = []
     distance = []
     for i in range(length):
 
@@ -207,11 +217,23 @@ def width(wimg_path):
             if space[l][0]>= i*20+2 and space[l][0]< i*20+4:
                 qq2.append(space[l][1])
 
+            if space[l][0]>= i*20+4 and space[l][0]< i*20+6:
+                qq7.append(space[l][1])
+
+            if space[l][0]>= i*20+6 and space[l][0]< i*20+8:
+                qq8.append(space[l][1])
+
             if space[l][0]>= i*20+8 and space[l][0]< i*20+10:
                 qq3.append(space[l][1])
 
             if space[l][0]> i*20+10 and space[l][0]< i*20+12:
                 qq4.append(space[l][1])
+
+            if space[l][0]>= i*20+12 and space[l][0]< i*20+14:
+                qq9.append(space[l][1])
+
+            if space[l][0]>= i*20+14 and space[l][0]< i*20+16:
+                qq10.append(space[l][1])
 
             if space[l][0] >= i * 20 + 16 and space[l][0] < i * 20 + 18:
                 qq5.append(space[l][1])
@@ -241,41 +263,74 @@ def width(wimg_path):
         qq6.sort()
         d6 = math.ceil(len(qq6) / 100) - 1
         D6 = math.ceil(len(qq6) / 100 * 95) - 1
-        if d!=-1 and d2!=-1 and d3!=-1 and d4!=-1 and d5!=-1 and d6!=-1:
+
+        qq7. sort()
+        d7 = math.ceil(len(qq7) / 100) - 1
+        D7 = math.ceil(len(qq7) / 100 * 95) - 1
+
+        qq8.sort()
+        d8 = math.ceil(len(qq8) / 100) - 1
+        D8 = math.ceil(len(qq8) / 100 * 95) - 1
+
+        qq9.sort()
+        d9 = math.ceil(len(qq9) / 100) - 1
+        D9 = math.ceil(len(qq9) / 100 * 95) - 1
+
+        qq10.sort()
+        d10 = math.ceil(len(qq10) / 100) - 1
+        D10 = math.ceil(len(qq10) / 100 * 95) - 1
+
+        if d!=-1 and d2!=-1 and d3!=-1 and d4!=-1 and d5!=-1 and d6!=-1 and d7!=-1 and d8!=-1 and d9!=-1 and d10!=-1:
             dist = qq[D]-qq[d]
             dist2 = qq2[D2]-qq2[d2]
             dist3 = qq3[D3]-qq3[d3]
             dist4 = qq4[D4]-qq4[d4]
             dist5 = qq5[D5]-qq5[d5]
             dist6 = qq6[D6]-qq6[d6]
+            dist7 = qq7[D7]-qq7[d7]
+            dist8 = qq8[D8]-qq8[d8]
+            dist9 = qq9[D9]-qq9[d9]
+            dist10 = qq10[D10]-qq10[d10]
+
             Dist = (dist+dist2)/2
             Dist2 = (dist3+dist4)/2
             Dist3 = (dist5+dist6)/2
+            Dist4 = (dist7+dist8)/2
+            Dist5 = (dist9+dist10)/2
+
             distance.append([i*20+2,Dist,math.ceil((qq[d]+qq2[d2])/2),math.ceil((qq[D]+qq2[D2])/2)])
+            distance.append([i*20+6, Dist4, math.ceil((qq7[d7] +qq8[d8])/2), math.ceil((qq7[D7] + qq8[D8])/2)])
             distance.append([i*20+10,Dist2,math.ceil((qq3[d3]+qq4[d4])/2),math.ceil((qq3[D3]+qq4[D4])/2)])
-            distance.append([i*20+18, Dist3, math.ceil((qq5[d5] + qq6[d6]) / 2), math.ceil((qq5[D5] + qq6[D6]) / 2)])
+            distance.append([i*20+14, Dist5, math.ceil((qq9[d9]+qq10[d10])/2),math.ceil((qq9[D9]+qq10[D10])/2)])
+            distance.append([i*20+18, Dist3, math.ceil((qq5[d5] + qq6[d6]) / 2), math.ceil((qq5[D5] + qq6[D6])/2)])
             qq = []
             qq2 = []
             qq3 = []
             qq4 = []
             qq5 = []
             qq6 = []
+            qq7 = []
+            qq8 = []
+            qq9 = []
+            qq10 = []
             space=[]
 
 
     new_distance = []
     img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
-    for i in range(len(distance)):
 
+    for i in range(len(distance)):
         cv2.line(img, (distance[i][2], distance[i][0]), (distance[i][3], distance[i][0]), (255,0,255), 3)
         new_distance.append((distance[i][0], distance[i][1]))
     print("(pixel location, distance)",new_distance)
     # plt.imshow(img)
     # plt.show()
-    # cv2.imshow('My Image', img)
-    #
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    # moneyy = cv2.addWeighted(money, 0.5, img, 0.5, 0)
+    # cv2.imshow('My Image', moneyy)
+    cv2.imshow('My Image', img)
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 if __name__=='__main__':
     # x,y,img = tif_to_point(img_path="test.tiff")
     # x,y = simple_regression(x,y,img)
